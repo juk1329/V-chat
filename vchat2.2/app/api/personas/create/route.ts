@@ -1,30 +1,25 @@
+// app/api/personas/create/route.ts
 import { type NextRequest, NextResponse } from "next/server"
+import { personaService } from "@/lib/persona-service"
 
 export async function POST(request: NextRequest) {
   try {
     const { name, url, voiceId, modelId } = await request.json()
 
-    const response = await fetch(`${process.env.BACKEND_URL}/api/personas/create`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name,
-        url,
-        voice_id: voiceId || null,
-        model_id: modelId || null,
-      }),
-    })
-
-    if (!response.ok) {
-      throw new Error("Failed to create persona")
+    if (!name || !url) {
+      return NextResponse.json({ 
+        success: false, 
+        error: "Name and URL are required" 
+      }, { status: 400 })
     }
 
-    const data = await response.json()
+    const data = await personaService.createPersona(name, url, voiceId, modelId)
     return NextResponse.json(data)
   } catch (error) {
     console.error("Error creating persona:", error)
-    return NextResponse.json({ success: false, error: "Failed to create persona" }, { status: 500 })
+    return NextResponse.json({ 
+      success: false, 
+      error: "Failed to create persona" 
+    }, { status: 500 })
   }
 }

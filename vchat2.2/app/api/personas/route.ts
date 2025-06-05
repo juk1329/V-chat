@@ -1,23 +1,17 @@
+// app/api/personas/route.ts
 import { NextResponse } from "next/server"
+import { personaService } from "@/lib/persona-service"
 
 export async function GET() {
   try {
-    // FastAPI 백엔드 호출
-    const response = await fetch(`${process.env.BACKEND_URL}/api/personas`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch personas")
-    }
-
-    const data = await response.json()
+    const data = personaService.getPersonas()
     return NextResponse.json(data)
   } catch (error) {
     console.error("Error fetching personas:", error)
-    return NextResponse.json({ success: false, error: "Failed to fetch personas" }, { status: 500 })
+    return NextResponse.json({ 
+      success: false, 
+      error: "Failed to fetch personas",
+      personas: []
+    }, { status: 500 })
   }
 }
